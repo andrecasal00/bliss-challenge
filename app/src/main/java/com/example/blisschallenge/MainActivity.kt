@@ -25,6 +25,7 @@ import com.example.blisschallenge.viewmodels.BlissViewModel
 import com.example.blisschallenge.views.AvatarListScreen
 import com.example.blisschallenge.views.EmojiListScreen
 import com.example.blisschallenge.views.HomeScreen
+import com.example.blisschallenge.views.ReposListScreen
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -66,7 +67,7 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable("RepoListScreen") {
-
+                        ReposListScreen(navController = navController, viewModel = blissViewModel)
                     }
                 }
             }

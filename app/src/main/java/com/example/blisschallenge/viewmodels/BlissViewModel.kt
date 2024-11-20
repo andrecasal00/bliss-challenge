@@ -3,14 +3,21 @@ package com.example.blisschallenge.viewmodels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.example.blisschallenge.data.Avatar
 import com.example.blisschallenge.data.Emoji
+import com.example.blisschallenge.data.Items
 import com.example.blisschallenge.local.avatar.AvatarDao
 import com.example.blisschallenge.local.avatar.AvatarEntity
 import com.example.blisschallenge.local.emoji.EmojiDao
 import com.example.blisschallenge.local.emoji.EmojiEntity
+import com.example.blisschallenge.network.GoogleRepoUserSource
 import com.example.blisschallenge.network.HttpRequest
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -99,4 +106,8 @@ class BlissViewModel(
             }
         }
     }
+
+    val googleRepos: Flow<PagingData<Items>> = Pager(PagingConfig(pageSize = 1)) {
+        GoogleRepoUserSource()
+    }.flow.cachedIn(viewModelScope)
 }

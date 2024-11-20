@@ -3,6 +3,7 @@ package com.example.blisschallenge.network
 import android.util.Log
 import com.example.blisschallenge.data.Avatar
 import com.example.blisschallenge.data.Emoji
+import com.example.blisschallenge.data.GoogleRepo
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.android.Android
@@ -35,5 +36,13 @@ class HttpRequest {
     suspend fun getAvatarByUsername(username: String): Avatar {
         val response: Avatar = httpClient.get("https://api.github.com/users/${username}").body()
         return Avatar(response.username, response.url)
+    }
+
+    suspend fun getGoogleRepos(page: Int = 1): GoogleRepo {
+        Log.d("GOOGLE", "GOOGLE REPOS: page: $page")
+
+        val response: GoogleRepo = httpClient.get("https://api.github.com/search/repositories?q=google&per_page=10&page=${page}").body()
+        return response
+
     }
 }

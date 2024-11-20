@@ -79,4 +79,7 @@ dependencies {
     // Navigation
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
+
+    // Pagination
+    implementation(libs.androidx.paging.compose)
 }
