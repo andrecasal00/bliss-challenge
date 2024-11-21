@@ -1,6 +1,7 @@
 package com.example.blisschallenge.viewmodels
 
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -18,7 +19,10 @@ import com.example.blisschallenge.network.GoogleRepoUserSource
 import com.example.blisschallenge.network.HttpRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
@@ -37,7 +41,16 @@ class BlissViewModel(
 
     private val request = HttpRequest()
 
+    val googleRepos: Flow<PagingData<Items>> = Pager(PagingConfig(pageSize = 1)) {
+        GoogleRepoUserSource()
+    }.flow.cachedIn(viewModelScope)
+
+    private val _toastMessage = MutableSharedFlow<String>()
+    val toastMessage: SharedFlow<String> = _toastMessage
+    //val toastMessage = _toastMessage.asSharedFlow()
+
     suspend fun fetchEmojis() {
+
         if (emojiDao.getAllEmojis().isEmpty()) {
             Log.d("HOME", "fetchEmojis: Fetched from REQUEST")
             _emojis.value = request.getAllEmojis()
@@ -71,8 +84,8 @@ class BlissViewModel(
             Log.d("HOME", "fetchAvatar: $avatar")
 
             if (avatar != null) {
-                Log.d("HOME", "fetchAvatar: Fetched from ROOM")
                 _avatars.value = Avatar(avatar.username, avatar.url)
+                Log.d("HOME", "fetchAvatar: Avatar fetched from ROOM")
 
             } else {
                 _avatars.value = request.getAvatarByUsername(username)
@@ -82,6 +95,7 @@ class BlissViewModel(
                         url = _avatars.value!!.url.toString()
                     )
                 )
+                Log.d("HOME", "fetchAvatar: Avatar fetched from Request")
             }
         } catch (e: Exception) {
             Log.d("HOME", "ERROR fetchAvatar: ${e.message}")
@@ -89,12 +103,11 @@ class BlissViewModel(
         }
     }
 
-    fun fetchAllAvatars() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _avatarsList.value = avatarDao.getAllAvatars().map {
-                Avatar(it.username, it.url)
-            }
+    suspend fun fetchAllAvatars() {
+        _avatarsList.value = avatarDao.getAllAvatars().map {
+            Avatar(it.username, it.url)
         }
+        Log.d("HOME", "fetchAllAvatars: Avatars fetched from ROOM")
     }
 
     fun removeAvatar(username: String) {
@@ -106,8 +119,4 @@ class BlissViewModel(
             }
         }
     }
-
-    val googleRepos: Flow<PagingData<Items>> = Pager(PagingConfig(pageSize = 1)) {
-        GoogleRepoUserSource()
-    }.flow.cachedIn(viewModelScope)
 }
