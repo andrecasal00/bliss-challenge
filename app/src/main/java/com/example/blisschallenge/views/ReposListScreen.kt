@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -17,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -64,34 +66,42 @@ fun ReposListScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-
-            LazyColumn {
-                items(
-                    count = repos.itemCount,
-                    key = repos.itemKey { repo -> repo.url },
-                    contentType = repos.itemContentType { repo -> "repo" }
-                ) { index ->
-                    val repo = repos[index]
-                    if (repo != null) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .wrapContentHeight()
-                                .padding(10.dp)
-                                .clip(RoundedCornerShape(16.dp))
-                                .background(Color(0xFF0C3380))
-                        ) {
-                            Text(
-                                text = repo.url,
-                                modifier = Modifier.padding(16.dp),
-                                style = MaterialTheme.typography.bodyLarge
-                                    .copy(fontSize = 20.sp),
-                                color = Color.White
-                            )
+            if (repos.itemCount > 0) {
+                LazyColumn {
+                    items(
+                        count = repos.itemCount,
+                        key = repos.itemKey { repo -> repo.url },
+                        contentType = repos.itemContentType { repo -> "repo" }
+                    ) { index ->
+                        val repo = repos[index]
+                        if (repo != null) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .wrapContentHeight()
+                                    .padding(10.dp)
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .background(Color(0xFF0C3380))
+                            ) {
+                                Text(
+                                    text = repo.url,
+                                    modifier = Modifier.padding(16.dp),
+                                    style = MaterialTheme.typography.bodyLarge
+                                        .copy(fontSize = 20.sp),
+                                    color = Color.White
+                                )
+                            }
                         }
                     }
                 }
+            } else {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(innerPadding),
+                )
             }
+
         }
     }
 }
