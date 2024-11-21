@@ -2,13 +2,6 @@
 
 This is the bliss applications challenge!
 
-### Functionalities
-
-- Request Popular and Top Rated Movies
-- See the movie information
-- Add movies to your favorites
-- Remove movie from your favorites
-
 ### What I've used
 
 - Jetpack Compose
