@@ -5,12 +5,15 @@ import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -18,6 +21,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -64,126 +68,133 @@ fun HomeScreen(
                 .fillMaxSize(),
             color = Color.White
         ) {
-            Column(
+            LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top
             ) {
-                var username by remember { mutableStateOf("") }
-                var url by remember { mutableStateOf("") }
+                item {
+                    var username by remember { mutableStateOf("") }
+                    var url by remember { mutableStateOf("") }
 
-                LaunchedEffect(Unit) {
-                    url = "https://images.emojiterra.com/google/noto-emoji/unicode-16.0/color/1024px/263a.png"
-                }
-
-                val avatar by viewModel.avatars.collectAsState()
-                val scope = rememberCoroutineScope()
-
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth()
-                        .padding(top = 30.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    DisplayAvatarOrEmoji(url = url)
-
-                    Button(
-                        onClick = {
-                            scope.launch {
-                                url = viewModel.generateEmoji()
-                                Log.d("HOME", "HomeScreen: $url")
-                            }
-                        },
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0C3380)),
-                        modifier = Modifier
-                            .padding(top = 16.dp)
-                            .fillMaxWidth(0.8f)
-                    ) {
-                        Text("Random Emoji", color = Color.White, style = MaterialTheme.typography.bodyLarge)
+                    LaunchedEffect(Unit) {
+                        url = "https://images.emojiterra.com/google/noto-emoji/unicode-16.0/color/1024px/263a.png"
                     }
 
-                    Button(
-                        onClick = { navController.navigate("EmojiListScreen") },
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0C3380)),
+                    val avatar by viewModel.avatars.collectAsState()
+                    val scope = rememberCoroutineScope()
+
+                    Column(
                         modifier = Modifier
-                            .padding(top = 12.dp)
-                            .fillMaxWidth(0.8f)
+                            .fillMaxWidth()
+                            .padding(top = 30.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
                     ) {
-                        Text("Emoji List", color = Color.White, style = MaterialTheme.typography.bodyLarge)
-                    }
-                }
-
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth()
-                        .padding(bottom = 30.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Top
-                ) {
-
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center,
-                        modifier = Modifier.fillMaxWidth().padding(16.dp)
-                    ) {
-                        TextField(
-                            value = username,
-                            onValueChange = { username = it },
-                            modifier = Modifier
-                                .padding(end = 10.dp)
-                                .fillMaxWidth(0.7f),
-                            label = { Text("Search Github Username") },
-                        )
+                        DisplayAvatarOrEmoji(url = url)
 
                         Button(
-                            shape = RoundedCornerShape(12.dp),
                             onClick = {
                                 scope.launch {
-                                    viewModel.fetchAvatar(username)
-                                    if (avatar != null) {
-                                        url = avatar!!.url.toString()
-                                    }
+                                    url = viewModel.generateEmoji()
+                                    Log.d("HOME", "HomeScreen: $url")
                                 }
                             },
+                            shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0C3380)),
-                            modifier = Modifier.size(56.dp)
+                            modifier = Modifier
+                                .padding(top = 16.dp)
+                                .fillMaxWidth(0.8f)
                         ) {
-                            Icon(
-                                imageVector = Icons.Filled.Search,
-                                contentDescription = "Search",
-                                tint = Color.White,
-                                modifier = Modifier.size(50.dp)
-                            )
+                            Text("Random Emoji", color = Color.White, style = MaterialTheme.typography.bodyLarge)
+                        }
+
+                        Button(
+                            onClick = { navController.navigate("EmojiListScreen") },
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0C3380)),
+                            modifier = Modifier
+                                .padding(top = 12.dp)
+                                .fillMaxWidth(0.8f)
+                        ) {
+                            Text("Emoji List", color = Color.White, style = MaterialTheme.typography.bodyLarge)
                         }
                     }
 
-                    Button(
-                        onClick = { navController.navigate("AvatarListScreen") },
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0C3380)),
+                    Spacer(
                         modifier = Modifier
-                            .padding(10.dp)
-                            .fillMaxWidth(0.8f)
-                    ) {
-                        Text("Avatar List", color = Color.White, style = MaterialTheme.typography.bodyLarge)
-                    }
+                            .fillMaxWidth()
+                            .height(20.dp)
+                    )
 
-                    Button(
-                        onClick = { navController.navigate("RepoListScreen") },
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0C3380)),
+                    Column(
                         modifier = Modifier
-                            .padding(10.dp)
-                            .fillMaxWidth(0.8f)
+                            .fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Top
                     ) {
-                        Text("Google Repos", color = Color.White, style = MaterialTheme.typography.bodyLarge)
+
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center,
+                            modifier = Modifier.fillMaxWidth().imePadding()
+                        ) {
+                            OutlinedTextField(
+                                shape = RoundedCornerShape(12.dp),
+                                value = username,
+                                onValueChange = { username = it },
+                                modifier = Modifier
+                                    .padding(end = 10.dp)
+                                    .fillMaxWidth(0.6f),
+                                label = { Text("Search Github Username") },
+                            )
+
+                            Button(
+                                shape = RoundedCornerShape(12.dp),
+                                onClick = {
+                                    scope.launch {
+                                        viewModel.fetchAvatar(username)
+                                        if (avatar != null) {
+                                            url = avatar!!.url.toString()
+                                        }
+                                    }
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0C3380)),
+                                modifier = Modifier.size(56.dp).fillMaxWidth(0.6f)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Search,
+                                    contentDescription = "Search",
+                                    tint = Color.White,
+                                    modifier = Modifier.size(50.dp)
+                                )
+                            }
+                        }
+
+                        Button(
+                            onClick = { navController.navigate("AvatarListScreen") },
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0C3380)),
+                            modifier = Modifier
+                                .padding(10.dp)
+                                .fillMaxWidth(0.8f)
+                        ) {
+                            Text("Avatar List", color = Color.White, style = MaterialTheme.typography.bodyLarge)
+                        }
+
+                        Button(
+                            onClick = { navController.navigate("RepoListScreen") },
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0C3380)),
+                            modifier = Modifier
+                                .padding(10.dp)
+                                .fillMaxWidth(0.8f)
+                        ) {
+                            Text("Google Repos", color = Color.White, style = MaterialTheme.typography.bodyLarge)
+                        }
                     }
                 }
+
             }
         }
     }
