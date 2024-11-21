@@ -30,6 +30,8 @@ class BlissViewModel(
     private val emojiDao: EmojiDao,
     private val avatarDao: AvatarDao
 ): ViewModel() {
+    private val request = HttpRequest()
+
     private val _emojis = MutableStateFlow<List<Emoji>>(emptyList())
     val emojis = _emojis.asStateFlow()
 
@@ -39,7 +41,8 @@ class BlissViewModel(
     private val _avatarsList = MutableStateFlow<List<Avatar>>(emptyList())
     val avatarsList = _avatarsList.asStateFlow()
 
-    private val request = HttpRequest()
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing = _isRefreshing.asStateFlow()
 
     val googleRepos: Flow<PagingData<Items>> = Pager(PagingConfig(pageSize = 1)) {
         GoogleRepoUserSource()
@@ -120,7 +123,4 @@ class BlissViewModel(
             }
         }
     }
-
-    private val _isRefreshing = MutableStateFlow(false)
-    val isRefreshing = _isRefreshing.asStateFlow()
 }
