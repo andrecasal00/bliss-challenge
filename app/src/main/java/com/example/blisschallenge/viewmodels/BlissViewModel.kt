@@ -50,7 +50,7 @@ class BlissViewModel(
     //val toastMessage = _toastMessage.asSharedFlow()
 
     suspend fun fetchEmojis() {
-
+        _isRefreshing.value = true
         if (emojiDao.getAllEmojis().isEmpty()) {
             Log.d("HOME", "fetchEmojis: Fetched from REQUEST")
             _emojis.value = request.getAllEmojis()
@@ -65,6 +65,7 @@ class BlissViewModel(
                 Emoji(it.name, it.url)
             }
         }
+        _isRefreshing.value = false
     }
 
     suspend fun generateEmoji(): String {
@@ -119,4 +120,7 @@ class BlissViewModel(
             }
         }
     }
+
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing = _isRefreshing.asStateFlow()
 }

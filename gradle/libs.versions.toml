@@ -1,4 +1,5 @@
 [versions]
+accompanistSwiperefresh = "0.28.0"
 agp = "8.7.2"
 coilCompose = "2.6.0"
 kotlin = "2.0.0"
@@ -18,6 +19,7 @@ roomVersion = "2.6.1"
 slf4jAndroid = "1.7.36"
 
 [libraries]
+accompanist-swiperefresh = { module = "com.google.accompanist:accompanist-swiperefresh", version.ref = "accompanistSwiperefresh" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycleRuntimeCompose" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }

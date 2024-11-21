@@ -39,6 +39,9 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.blisschallenge.utilities.NavigationTopBar
 import com.example.blisschallenge.viewmodels.BlissViewModel
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import kotlinx.coroutines.launch
 
 @Composable
 fun EmojiListScreen(
@@ -49,6 +52,11 @@ fun EmojiListScreen(
     var goBackCounter by remember {
         mutableIntStateOf(0)
     }
+
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
+    val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = isRefreshing)
+
+    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
         containerColor = Color.White,
@@ -77,37 +85,45 @@ fun EmojiListScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-
-            if (emojis.isNotEmpty()) {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(4),
-                    contentPadding = PaddingValues(10.dp),
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(10.dp)
-                ) {
-                    items(emojis) { emoji ->
-                        AsyncImage(
-                            model = emoji.url,
-                            contentDescription = emoji.name,
-                            modifier = Modifier
-                                .width(50.dp)
-                                .height(50.dp)
-                                .clip(RoundedCornerShape(8.dp))
-                                .padding(4.dp)
-                                .clickable(onClick = {
-                                    Log.d("TAG", "EmojiListScreen: CLICADO")
-                                    viewModel.removeEmoji(emoji)
-                                })
-                        )
+            SwipeRefresh(
+                state = swipeRefreshState,
+                onRefresh = {
+                    coroutineScope.launch {
+                        viewModel.fetchEmojis()
                     }
                 }
-            } else {
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(innerPadding),
-                )
+            ) {
+                if (emojis.isNotEmpty()) {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(4),
+                        contentPadding = PaddingValues(10.dp),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(10.dp)
+                    ) {
+                        items(emojis) { emoji ->
+                            AsyncImage(
+                                model = emoji.url,
+                                contentDescription = emoji.name,
+                                modifier = Modifier
+                                    .width(50.dp)
+                                    .height(50.dp)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .padding(4.dp)
+                                    .clickable(onClick = {
+                                        Log.d("TAG", "EmojiListScreen: CLICADO")
+                                        viewModel.removeEmoji(emoji)
+                                    })
+                            )
+                        }
+                    }
+                } else {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .padding(innerPadding),
+                    )
+                }
             }
         }
     }

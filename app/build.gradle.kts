@@ -82,4 +82,7 @@ dependencies {
 
     // Pagination
     implementation(libs.androidx.paging.compose)
+
+    // Refresh
+    implementation(libs.accompanist.swiperefresh)
 }
