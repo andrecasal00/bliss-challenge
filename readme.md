@@ -2,6 +2,17 @@
 
 This is the bliss applications challenge!
 
+### Features
+
+- Fetch all emojis from API/Room
+- Delete emoji from RAM
+- Pull to refresh emojis to update to the original list
+- Generate random emojis
+- Fetch stored avatars from Room
+- Fetch individual avatar from API/Room
+- Delete avatar from stored avatars
+- Fetch google repos with pagination
+
 ### What I've used
 
 - Jetpack Compose
