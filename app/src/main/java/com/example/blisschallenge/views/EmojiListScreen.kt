@@ -65,11 +65,6 @@ fun EmojiListScreen(
             )
         },
     ) { innerPadding ->
-
-        LaunchedEffect(Unit) {
-            viewModel.fetchEmojis()
-        }
-
         val emojis by viewModel.emojis.collectAsState()
 
         Column(

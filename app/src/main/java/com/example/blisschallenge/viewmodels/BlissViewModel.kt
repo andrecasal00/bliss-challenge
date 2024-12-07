@@ -17,6 +17,7 @@ import com.example.blisschallenge.local.emoji.EmojiDao
 import com.example.blisschallenge.local.emoji.EmojiEntity
 import com.example.blisschallenge.network.GoogleRepoUserSource
 import com.example.blisschallenge.network.HttpRequest
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -48,9 +49,11 @@ class BlissViewModel(
         GoogleRepoUserSource()
     }.flow.cachedIn(viewModelScope)
 
-    private val _toastMessage = MutableSharedFlow<String>()
-    val toastMessage: SharedFlow<String> = _toastMessage
-    //val toastMessage = _toastMessage.asSharedFlow()
+    init {
+        viewModelScope.launch {
+            fetchEmojis();
+        }
+    }
 
     suspend fun fetchEmojis() {
         _isRefreshing.value = true
@@ -71,8 +74,7 @@ class BlissViewModel(
         _isRefreshing.value = false
     }
 
-    suspend fun generateEmoji(): String {
-        fetchEmojis()
+    fun generateEmoji(): String {
         return _emojis.value.random().url
     }
 
