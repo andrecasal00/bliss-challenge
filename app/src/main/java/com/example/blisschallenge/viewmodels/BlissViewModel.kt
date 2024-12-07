@@ -18,6 +18,7 @@ import com.example.blisschallenge.local.emoji.EmojiEntity
 import com.example.blisschallenge.network.GoogleRepoUserSource
 import com.example.blisschallenge.network.HttpRequest
 import com.example.blisschallenge.repository.ApiRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -27,14 +28,12 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class BlissViewModel(
-    private val emojiDao: EmojiDao,
-    private val avatarDao: AvatarDao,
-): ViewModel() {
-    private val request = HttpRequest()
-    private val repository = ApiRepository(request, avatarDao, emojiDao)
-
+@HiltViewModel
+class BlissViewModel @Inject constructor(
+    private val repository: ApiRepository
+) : ViewModel() {
     private val _emojis = MutableStateFlow<List<Emoji>>(emptyList())
     val emojis = _emojis.asStateFlow()
 

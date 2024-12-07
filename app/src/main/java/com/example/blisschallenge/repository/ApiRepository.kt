@@ -7,8 +7,9 @@ import com.example.blisschallenge.local.avatar.AvatarEntity
 import com.example.blisschallenge.local.emoji.EmojiDao
 import com.example.blisschallenge.local.emoji.EmojiEntity
 import com.example.blisschallenge.network.HttpRequest
+import javax.inject.Inject
 
-class ApiRepository(
+class ApiRepository @Inject constructor(
     private val httpRequest: HttpRequest,
     private val avatarDao: AvatarDao,
     private val emojiDao: EmojiDao

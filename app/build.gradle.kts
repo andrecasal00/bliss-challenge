@@ -5,6 +5,7 @@ plugins {
     kotlin("plugin.serialization") version "1.9.0"
     id("com.google.devtools.ksp")
     id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -85,4 +86,11 @@ dependencies {
 
     // Refresh
     implementation(libs.accompanist.swiperefresh)
+
+    // Dagger Hilt
+    implementation(libs.hilt.android)
+    implementation(libs.androidx.hilt.navigation.compose)
+    kapt(libs.hilt.android.compiler)
+
+
 }

@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
@@ -26,31 +27,17 @@ import com.example.blisschallenge.views.AvatarListScreen
 import com.example.blisschallenge.views.EmojiListScreen
 import com.example.blisschallenge.views.HomeScreen
 import com.example.blisschallenge.views.ReposListScreen
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val database by lazy {
-        Room.databaseBuilder(
-            applicationContext,
-            BlissDatabase::class.java,
-            "bliss.db"
-        ).build()
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             BlissChallengeTheme {
-                val blissViewModel by viewModels<BlissViewModel> (
-                    factoryProducer = {
-                        object : ViewModelProvider.Factory {
-                            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                                return BlissViewModel(emojiDao = database.emojiDao, avatarDao = database.avatarDao) as T
-                            }
-                        }
-                    }
-                )
+                val blissViewModel = hiltViewModel<BlissViewModel>()
 
                 val navController = rememberNavController()
                 NavHost(navController = navController, startDestination = "HomeScreen") {
