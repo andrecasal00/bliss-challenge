@@ -17,6 +17,7 @@ import com.example.blisschallenge.local.emoji.EmojiDao
 import com.example.blisschallenge.local.emoji.EmojiEntity
 import com.example.blisschallenge.network.GoogleRepoUserSource
 import com.example.blisschallenge.network.HttpRequest
+import com.example.blisschallenge.repository.ApiRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -29,9 +30,10 @@ import kotlinx.coroutines.launch
 
 class BlissViewModel(
     private val emojiDao: EmojiDao,
-    private val avatarDao: AvatarDao
+    private val avatarDao: AvatarDao,
 ): ViewModel() {
     private val request = HttpRequest()
+    private val repository = ApiRepository(request, avatarDao, emojiDao)
 
     private val _emojis = MutableStateFlow<List<Emoji>>(emptyList())
     val emojis = _emojis.asStateFlow()
@@ -51,27 +53,23 @@ class BlissViewModel(
 
     init {
         viewModelScope.launch {
-            fetchEmojis();
+            fetchEmojis()
         }
     }
 
-    suspend fun fetchEmojis() {
-        _isRefreshing.value = true
-        if (emojiDao.getAllEmojis().isEmpty()) {
-            Log.d("HOME", "fetchEmojis: Fetched from REQUEST")
-            _emojis.value = request.getAllEmojis()
-            emojiDao.insertEmoji(
-                _emojis.value.map {
-                    EmojiEntity(name = it.name, url = it.url)
-                }
-            )
-        } else {
-            Log.d("HOME", "fetchEmojis: Fetched from ROOM")
-            _emojis.value = emojiDao.getAllEmojis().map {
-                Emoji(it.name, it.url)
+    fun fetchEmojis() {
+        viewModelScope.launch {
+            _isRefreshing.value = true
+            try {
+                val emojis = repository.getAllEmojis()
+                _emojis.value = emojis
+            } catch (e: Exception) {
+                Log.d("HOME", "ERROR fetchEmojis: ${e.message}")
+                _emojis.value = emptyList()
+            } finally {
+                _isRefreshing.value = false
             }
         }
-        _isRefreshing.value = false
     }
 
     fun generateEmoji(): String {
@@ -84,44 +82,31 @@ class BlissViewModel(
         }
     }
 
-    suspend fun fetchAvatar(username: String) {
-        try {
-            val avatar = avatarDao.getAvatarByUsername(username)
-            Log.d("HOME", "fetchAvatar: $avatar")
-
-            if (avatar != null) {
-                _avatars.value = Avatar(avatar.username, avatar.url)
-                Log.d("HOME", "fetchAvatar: Avatar fetched from ROOM")
-
-            } else {
-                _avatars.value = request.getAvatarByUsername(username)
-                avatarDao.insertAvatar(
-                    AvatarEntity(
-                        username = _avatars.value!!.username.toString(),
-                        url = _avatars.value!!.url.toString()
-                    )
-                )
-                Log.d("HOME", "fetchAvatar: Avatar fetched from Request")
+    fun fetchAvatar(username: String) {
+        viewModelScope.launch {
+            try {
+                val avatar = repository.getAvatar(username)
+                _avatars.value = avatar
+            } catch (e: Exception) {
+                Log.d("HOME", "ERROR fetchAvatar: ${e.message}")
+                _avatars.value = null
             }
-        } catch (e: Exception) {
-            Log.d("HOME", "ERROR fetchAvatar: ${e.message}")
-            _avatars.value = null
         }
     }
 
     suspend fun fetchAllAvatars() {
-        _avatarsList.value = avatarDao.getAllAvatars().map {
-            Avatar(it.username, it.url)
-        }
+        val updatedList = repository.getAllAvatars()
+        _avatarsList.value = updatedList
         Log.d("HOME", "fetchAllAvatars: Avatars fetched from ROOM")
     }
 
     fun removeAvatar(username: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            avatarDao.deleteAvatar(username)
-
-            _avatarsList.value = avatarDao.getAllAvatars().map {
-                Avatar(it.username, it.url)
+        viewModelScope.launch {
+            try {
+                val updatedList = repository.removeAvatar(username)
+                _avatarsList.value = updatedList
+            } catch (e: Exception) {
+                Log.e("MyViewModel", "Error removing avatar", e)
             }
         }
     }
